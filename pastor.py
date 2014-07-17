@@ -3,27 +3,37 @@
 import os
 import hashlib
 import getpass
+import argparse
 
-password_length = 12 - 5
+def get_base():
+  return getpass.getpass( "Enter base phrase: " )
 
-base_phrase = getpass.getpass( "Enter base phrase: " )
+def get_checksum(sanity_check):
+  sanity_check = hashlib.sha256()
+  sanity_check.update( base_phrase.encode('utf-8') )
+  return sum( [ x for x in sanity_check.digest() ] )
 
-sanity_check = hashlib.sha256()
-sanity_check.update( base_phrase )
+def get_door():
+  return input( "Enter door id: " )
 
-print sum( [ ord( x ) for x in sanity_check.digest() ] )
-
-valid_characters = 'abcdefghijklmnopqrstuvwxyz0123456789'
-
-while ( True ) :
-  door_id = raw_input( "Enter door id: " )
-  if ( door_id == '' ) :
-    break
-
+def make_password(base_phrase, door_id, length, valid_chars):
   key_data = hashlib.sha256()
-  key_data.update( base_phrase + ' - ' + door_id )
+  key_data.update( (base_phrase + ' - ' + door_id).encode('utf-8') )
 
-  print ''.join( [ valid_characters[ ord( x ) % len( valid_characters ) ] for x in key_data.digest() ][:password_length] )
+  return ''.join( [ valid_characters[ x % len( valid_chars ) ] for x in key_data.digest() ][:length] )
 
-os.system( 'clear' )
+if __name__ == '__main__':
+  argparser = argparse.ArgumentParser(description="Store all your passwords without storing them anywhere")
+  argparser.add_argument('-d', '--door', type=str, default='', required=False)
+  argparser.add_argument('length', type=int, default=8)
 
+  args = argparser.parse_args()
+
+  base_phrase = get_base()
+  print(get_checksum(base_phrase))
+
+  password_length = args.length
+  door_id = args.door or get_door()
+
+  valid_characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  print(make_password(base_phrase, door_id, password_length, valid_characters))
