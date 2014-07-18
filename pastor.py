@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import os
+import os, sys
 import hashlib
 import getpass
 import argparse
@@ -14,7 +14,8 @@ def get_checksum(sanity_check):
   return sum( [ x for x in sanity_check.digest() ] )
 
 def get_door():
-  return input( "Enter door id: " )
+  print( "Enter door id: ", file=sys.stderr, end="")
+  return input()
 
 def make_password(base_phrase, door_id, length, valid_chars):
   key_data = hashlib.sha256()
@@ -30,7 +31,7 @@ if __name__ == '__main__':
   args = argparser.parse_args()
 
   base_phrase = get_base()
-  print(get_checksum(base_phrase))
+  print(get_checksum(base_phrase), file=sys.stderr)
 
   password_length = args.length
   door_id = args.door or get_door()
