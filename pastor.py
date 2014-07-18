@@ -26,6 +26,8 @@ def make_password(base_phrase, door_id, length, valid_chars):
 if __name__ == '__main__':
   argparser = argparse.ArgumentParser(description="Store all your passwords without storing them anywhere")
   argparser.add_argument('-d', '--door', type=str, default='', required=False)
+  argparser.add_argument('-n', '--no-symbols', default=False, required=False,
+          dest='no_symbols', action='store_const', const=True)
   argparser.add_argument('length', type=int, default=8)
 
   args = argparser.parse_args()
@@ -37,4 +39,6 @@ if __name__ == '__main__':
   door_id = args.door or get_door()
 
   valid_characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  if not args.no_symbols:
+    valid_characters += '!@#$%^&*()-_=+[{}]|\\:;\'",<.>/?'
   print(make_password(base_phrase, door_id, password_length, valid_characters))
